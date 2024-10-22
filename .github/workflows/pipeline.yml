@@ -11,11 +11,23 @@ jobs:
     #description of the job
     name: The job to build the application docker image
     #To define the machine  that  runs a job we use "runs-on"
-    runs-on: ubuntu-latest
+    runs-on: csd-windows-local #Using the self-hosted runner
     #The instructions are defined as steps
     steps:
-      - name: Echo job
-        run: echo "Building the docker image..."
+      - name: Clone and Checkout to the repository
+        uses: actions/checkout@v2 # this is a GitHub action (pre-defined job)
+                                  # that clones the project into the working directory
+
+      - name: Build Docker Image
+        run: docker build -t flask-app-1:v1.0.0 -f Dockerfile .
+
+  deploy-docker-image:
+    name: Deploy the flask image
+    runs-on: csd-windows-local # Using the self-hosted runner
+    steps:
+      - name: Deploy the image
+        run: docker run -d -p 5000:5000 flask-app-1:v1.0.0 # -d tag allows the container in the background
+
   #Stage 2: Running the unit testing
   unit-test:
     name: The job to unit test the application
